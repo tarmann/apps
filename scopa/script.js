@@ -1,4 +1,11 @@
 const playersKey = 'scopa_players';
+const labels = {
+  cards: 'Cards',
+  coins: 'Coins',
+  settebello: 'Settebello',
+  primiera: 'Primiera',
+  scopa: 'Scopa'
+};
 
 function loadGame() {
   const stored = localStorage.getItem(playersKey);
@@ -15,57 +22,108 @@ function saveGame(data) {
 }
 
 function renderScores(players) {
-  document.getElementById('p1-name').textContent = players[0].name;
-  document.getElementById('p2-name').textContent = players[1].name;
+  const header = document.getElementById('score-header');
+  header.innerHTML = '<th class="px-2 py-1">Category</th>';
+  players.forEach(p => {
+    header.innerHTML += `<th class="px-2 py-1">${p.name}</th>`;
+  });
 
   const body = document.getElementById('score-body');
   body.innerHTML = '';
   const categories = ['cards', 'coins', 'settebello', 'primiera', 'scopa'];
-  const labels = {
-    cards: 'Cards',
-    coins: 'Coins',
-    settebello: 'Settebello',
-    primiera: 'Primiera',
-    scopa: 'Scopa'
-  };
 
   categories.forEach(cat => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="border px-2 py-1">${labels[cat]}</td>
-      <td class="border px-2 py-1">${players[0][cat]}</td>
-      <td class="border px-2 py-1">${players[1][cat]}</td>`;
+    let row = `<td class="border px-2 py-1">${labels[cat]}</td>`;
+    players.forEach(p => {
+      row += `<td class="border px-2 py-1">${p[cat]}</td>`;
+    });
+    tr.innerHTML = row;
     body.appendChild(tr);
   });
 
-  document.getElementById('p1-total').textContent = players[0].total;
-  document.getElementById('p2-total').textContent = players[1].total;
+  const totalRow = document.getElementById('score-total-row');
+  totalRow.innerHTML = '<td class="px-2 py-1">Total</td>';
+  players.forEach(p => {
+    totalRow.innerHTML += `<td class="px-2 py-1">${p.total}</td>`;
+  });
 }
 
-function startGame() {
-  const name1 = document.getElementById('player1').value.trim() || 'Player 1';
-  const name2 = document.getElementById('player2').value.trim() || 'Player 2';
-  const players = [
-    { name: name1, cards: 0, coins: 0, settebello: 0, primiera: 0, scopa: 0, total: 0 },
-    { name: name2, cards: 0, coins: 0, settebello: 0, primiera: 0, scopa: 0, total: 0 }
-  ];
+function buildRoundForm(players) {
+  const container = document.getElementById('round-fields');
+  container.innerHTML = '';
+  const winnerCats = ['cards', 'coins', 'settebello', 'primiera'];
+
+  winnerCats.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = 'grid grid-cols-2 gap-2 items-center';
+    div.innerHTML = `<label>${labels[cat]}</label>`;
+
+    const select = document.createElement('select');
+    select.id = `${cat}-winner`;
+    select.className = 'border p-1';
+    const noneOption = document.createElement('option');
+    noneOption.value = '';
+    noneOption.textContent = 'None';
+    select.appendChild(noneOption);
+    players.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.name;
+      select.appendChild(opt);
+    });
+    div.appendChild(select);
+    container.appendChild(div);
+  });
+
+  const scopaDiv = document.createElement('div');
+  scopaDiv.className = 'grid gap-2 items-center';
+  scopaDiv.style.gridTemplateColumns = `repeat(${players.length + 1}, minmax(0, 1fr))`;
+  scopaDiv.appendChild(document.createElement('label')).textContent = labels.scopa;
+  players.forEach((p, i) => {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = `p${i + 1}-scopa`;
+    input.value = 0;
+    input.className = 'border p-1';
+    scopaDiv.appendChild(input);
+  });
+  container.appendChild(scopaDiv);
+}
+
+function startGame(count) {
+  const players = [];
+  for (let i = 1; i <= count; i++) {
+    const name = document.getElementById(`player${i}`).value.trim() || `Player ${i}`;
+    players.push({ name, cards: 0, coins: 0, settebello: 0, primiera: 0, scopa: 0, total: 0 });
+  }
   saveGame(players);
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-area').classList.remove('hidden');
+  buildRoundForm(players);
   renderScores(players);
+  return players;
 }
 
 function addRound(players) {
-  const fields = ['cards', 'coins', 'settebello', 'primiera', 'scopa'];
-  fields.forEach(field => {
-    const p1Val = parseInt(document.getElementById(`p1-${field}`).value, 10) || 0;
-    const p2Val = parseInt(document.getElementById(`p2-${field}`).value, 10) || 0;
-    players[0][field] += p1Val;
-    players[1][field] += p2Val;
-    players[0].total += p1Val;
-    players[1].total += p2Val;
-    document.getElementById(`p1-${field}`).value = 0;
-    document.getElementById(`p2-${field}`).value = 0;
+  const winnerCats = ['cards', 'coins', 'settebello', 'primiera'];
+  winnerCats.forEach(cat => {
+    const val = document.getElementById(`${cat}-winner`).value;
+    if (val !== '') {
+      const idx = parseInt(val, 10);
+      players[idx][cat] += 1;
+      players[idx].total += 1;
+    }
+    document.getElementById(`${cat}-winner`).value = '';
   });
+
+  players.forEach((p, i) => {
+    const val = parseInt(document.getElementById(`p${i + 1}-scopa`).value, 10) || 0;
+    p.scopa += val;
+    p.total += val;
+    document.getElementById(`p${i + 1}-scopa`).value = 0;
+  });
+
   saveGame(players);
   renderScores(players);
 }
@@ -75,23 +133,28 @@ function setup() {
   const startScreen = document.getElementById('start-screen');
   const gameArea = document.getElementById('game-area');
   const roundForm = document.getElementById('round-form');
+  const numSelect = document.getElementById('num-players');
+
+  numSelect.addEventListener('change', () => {
+    const count = parseInt(numSelect.value, 10);
+    for (let i = 3; i <= 4; i++) {
+      document.getElementById(`player${i}-field`).classList.toggle('hidden', i > count);
+    }
+  });
 
   let players = storedPlayers || null;
   if (players) {
     startScreen.classList.add('hidden');
     gameArea.classList.remove('hidden');
+    buildRoundForm(players);
     renderScores(players);
+  } else {
+    numSelect.dispatchEvent(new Event('change'));
   }
 
   document.getElementById('start-btn').addEventListener('click', () => {
-    players = [
-      { name: document.getElementById('player1').value.trim() || 'Player 1', cards: 0, coins: 0, settebello: 0, primiera: 0, scopa: 0, total: 0 },
-      { name: document.getElementById('player2').value.trim() || 'Player 2', cards: 0, coins: 0, settebello: 0, primiera: 0, scopa: 0, total: 0 }
-    ];
-    saveGame(players);
-    startScreen.classList.add('hidden');
-    gameArea.classList.remove('hidden');
-    renderScores(players);
+    const count = parseInt(numSelect.value, 10);
+    players = startGame(count);
   });
 
   document.getElementById('add-round').addEventListener('click', () => {
