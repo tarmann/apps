@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scopa Score Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+  <h1 class="text-3xl font-bold text-center mb-6">Scopa Score Tracker</h1>
+  <!-- Start Screen -->
+  <div id="start-screen" class="max-w-md mx-auto bg-white p-4 rounded shadow">
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold" for="player1">Player 1 Name</label>
+      <input id="player1" type="text" class="w-full border p-2" />
+    </div>
+    <div class="mb-4">
+      <label class="block mb-2 font-semibold" for="player2">Player 2 Name</label>
+      <input id="player2" type="text" class="w-full border p-2" />
+    </div>
+    <button id="start-btn" class="w-full bg-blue-600 text-white py-2 rounded">Start Game</button>
+  </div>
+
+  <!-- Scoreboard -->
+  <div id="game-area" class="hidden">
+    <div class="flex justify-between mb-4">
+      <h2 class="text-xl font-semibold">Scores</h2>
+      <button id="clear-btn" class="bg-red-500 text-white px-3 py-1 rounded">New Game</button>
+    </div>
+    <table class="min-w-full text-center mb-4">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="px-2 py-1">Category</th>
+          <th id="p1-name" class="px-2 py-1"></th>
+          <th id="p2-name" class="px-2 py-1"></th>
+        </tr>
+      </thead>
+      <tbody id="score-body" class="bg-white">
+        <!-- Scores will be populated here -->
+      </tbody>
+      <tfoot>
+        <tr class="bg-gray-200 font-semibold">
+          <td class="px-2 py-1">Total</td>
+          <td id="p1-total" class="px-2 py-1">0</td>
+          <td id="p2-total" class="px-2 py-1">0</td>
+        </tr>
+      </tfoot>
+    </table>
+    <button id="add-round" class="bg-green-600 text-white px-3 py-1 rounded">Add Round</button>
+
+    <!-- Round Form -->
+    <div id="round-form" class="mt-4 hidden bg-white p-4 rounded shadow">
+      <h3 class="font-semibold mb-2">Round Scores</h3>
+      <div class="space-y-2">
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <label>Cards</label>
+          <input id="p1-cards" type="number" class="border p-1" value="0">
+          <input id="p2-cards" type="number" class="border p-1" value="0">
+        </div>
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <label>Coins</label>
+          <input id="p1-coins" type="number" class="border p-1" value="0">
+          <input id="p2-coins" type="number" class="border p-1" value="0">
+        </div>
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <label>Settebello</label>
+          <input id="p1-settebello" type="number" class="border p-1" value="0">
+          <input id="p2-settebello" type="number" class="border p-1" value="0">
+        </div>
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <label>Primiera</label>
+          <input id="p1-primiera" type="number" class="border p-1" value="0">
+          <input id="p2-primiera" type="number" class="border p-1" value="0">
+        </div>
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <label>Scopa</label>
+          <input id="p1-scopa" type="number" class="border p-1" value="0">
+          <input id="p2-scopa" type="number" class="border p-1" value="0">
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button id="cancel-round" class="px-3 py-1 border rounded">Cancel</button>
+        <button id="save-round" class="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
