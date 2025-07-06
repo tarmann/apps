@@ -11,12 +11,28 @@
   <!-- Start Screen -->
   <div id="start-screen" class="max-w-md mx-auto bg-white p-4 rounded shadow">
     <div class="mb-4">
+      <label class="block mb-2 font-semibold" for="num-players">Number of Players</label>
+      <select id="num-players" class="w-full border p-2">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div id="player1-field" class="mb-4 player-name">
       <label class="block mb-2 font-semibold" for="player1">Player 1 Name</label>
       <input id="player1" type="text" class="w-full border p-2" />
     </div>
-    <div class="mb-4">
+    <div id="player2-field" class="mb-4 player-name">
       <label class="block mb-2 font-semibold" for="player2">Player 2 Name</label>
       <input id="player2" type="text" class="w-full border p-2" />
+    </div>
+    <div id="player3-field" class="mb-4 player-name hidden">
+      <label class="block mb-2 font-semibold" for="player3">Player 3 Name</label>
+      <input id="player3" type="text" class="w-full border p-2" />
+    </div>
+    <div id="player4-field" class="mb-4 player-name hidden">
+      <label class="block mb-2 font-semibold" for="player4">Player 4 Name</label>
+      <input id="player4" type="text" class="w-full border p-2" />
     </div>
     <button id="start-btn" class="w-full bg-blue-600 text-white py-2 rounded">Start Game</button>
   </div>
@@ -29,20 +45,16 @@
     </div>
     <table class="min-w-full text-center mb-4">
       <thead>
-        <tr class="bg-gray-200">
+        <tr id="score-header" class="bg-gray-200">
           <th class="px-2 py-1">Category</th>
-          <th id="p1-name" class="px-2 py-1"></th>
-          <th id="p2-name" class="px-2 py-1"></th>
         </tr>
       </thead>
       <tbody id="score-body" class="bg-white">
         <!-- Scores will be populated here -->
       </tbody>
       <tfoot>
-        <tr class="bg-gray-200 font-semibold">
+        <tr id="score-total-row" class="bg-gray-200 font-semibold">
           <td class="px-2 py-1">Total</td>
-          <td id="p1-total" class="px-2 py-1">0</td>
-          <td id="p2-total" class="px-2 py-1">0</td>
         </tr>
       </tfoot>
     </table>
@@ -51,33 +63,7 @@
     <!-- Round Form -->
     <div id="round-form" class="mt-4 hidden bg-white p-4 rounded shadow">
       <h3 class="font-semibold mb-2">Round Scores</h3>
-      <div class="space-y-2">
-        <div class="grid grid-cols-3 gap-2 items-center">
-          <label>Cards</label>
-          <input id="p1-cards" type="number" class="border p-1" value="0">
-          <input id="p2-cards" type="number" class="border p-1" value="0">
-        </div>
-        <div class="grid grid-cols-3 gap-2 items-center">
-          <label>Coins</label>
-          <input id="p1-coins" type="number" class="border p-1" value="0">
-          <input id="p2-coins" type="number" class="border p-1" value="0">
-        </div>
-        <div class="grid grid-cols-3 gap-2 items-center">
-          <label>Settebello</label>
-          <input id="p1-settebello" type="number" class="border p-1" value="0">
-          <input id="p2-settebello" type="number" class="border p-1" value="0">
-        </div>
-        <div class="grid grid-cols-3 gap-2 items-center">
-          <label>Primiera</label>
-          <input id="p1-primiera" type="number" class="border p-1" value="0">
-          <input id="p2-primiera" type="number" class="border p-1" value="0">
-        </div>
-        <div class="grid grid-cols-3 gap-2 items-center">
-          <label>Scopa</label>
-          <input id="p1-scopa" type="number" class="border p-1" value="0">
-          <input id="p2-scopa" type="number" class="border p-1" value="0">
-        </div>
-      </div>
+      <div id="round-fields" class="space-y-2"></div>
       <div class="mt-4 flex justify-end space-x-2">
         <button id="cancel-round" class="px-3 py-1 border rounded">Cancel</button>
         <button id="save-round" class="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
