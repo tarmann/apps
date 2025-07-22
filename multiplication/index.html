@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplication Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-6">
+  <div class="max-w-md w-full text-center">
+    <h1 id="title" class="text-3xl font-bold mb-4">Multiplication Game</h1>
+    <div id="setup" class="mb-6">
+      <p class="mb-2">Select numbers to practice:</p>
+      <div id="numberSelect" class="grid grid-cols-5 gap-2 mb-4"></div>
+      <button id="selectAll" class="bg-blue-400 text-white px-3 py-1 rounded">Select All</button>
+      <button id="startGame" class="bg-green-500 text-white px-4 py-2 rounded mt-4">Start Game</button>
+    </div>
+
+    <div id="game" class="hidden">
+      <div id="feedback" class="text-red-500 font-bold text-lg mb-2"></div>
+      <div id="question" class="text-8xl font-extrabold mb-6">0 x 0</div>
+      <div id="choices" class="grid grid-cols-2 gap-4 text-xl"></div>
+      <div id="progress" class="mt-6 text-gray-600">Progress: 0 / 20</div>
+      <button id="playAgain" class="mt-6 hidden bg-purple-500 text-white px-4 py-2 rounded">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const numberSelectDiv = document.getElementById('numberSelect');
+    const selectAllBtn = document.getElementById('selectAll');
+    const startBtn = document.getElementById('startGame');
+    const setupDiv = document.getElementById('setup');
+    const gameDiv = document.getElementById('game');
+    const questionEl = document.getElementById('question');
+    const choicesEl = document.getElementById('choices');
+    const feedbackEl = document.getElementById('feedback');
+    const progressEl = document.getElementById('progress');
+    const playAgainBtn = document.getElementById('playAgain');
+
+    let selectedNumbers = [];
+    let count = 0;
+    let correctAnswer = 0;
+    let score = 10;
+    let startTime = 0;
+
+    // Create number buttons
+    for (let i = 1; i <= 9; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.className = 'bg-white border border-gray-400 rounded text-xl py-2 px-4 hover:bg-blue-100 transition-colors';
+      btn.dataset.value = i;
+      btn.onclick = () => {
+        btn.classList.toggle('bg-blue-500');
+        btn.classList.toggle('text-white');
+      };
+      numberSelectDiv.appendChild(btn);
+    }
+
+    selectAllBtn.onclick = () => {
+      document.querySelectorAll('#numberSelect button').forEach(btn => {
+        btn.classList.add('bg-blue-500', 'text-white');
+        btn.classList.remove('bg-white');
+      });
+    };
+
+    startBtn.onclick = () => {
+      startTime = Date.now();
+      document.getElementById('title').classList.add('hidden');
+      score = 10;
+      selectedNumbers = Array.from(document.querySelectorAll('#numberSelect button'))
+        .filter(btn => btn.classList.contains('bg-blue-500'))
+        .map(btn => parseInt(btn.dataset.value));
+
+      if (selectedNumbers.length === 0) {
+        alert('Please select at least one number.');
+        return;
+      }
+
+      count = 0;
+      setupDiv.classList.add('hidden');
+      gameDiv.classList.remove('hidden');
+      playAgainBtn.classList.add('hidden');
+      nextQuestion();
+    };
+
+    playAgainBtn.onclick = () => {
+      document.getElementById('title').classList.remove('hidden');
+      score = 0;
+      setupDiv.classList.remove('hidden');
+      gameDiv.classList.add('hidden');
+      feedbackEl.textContent = '';
+      questionEl.textContent = '0 x 0';
+      choicesEl.innerHTML = '';
+      progressEl.textContent = 'Progress: 0 / 10';
+    };
+
+    function nextQuestion() {
+      feedbackEl.textContent = '';
+      count++;
+
+      if (count > 10) {
+        questionEl.textContent = 'Game Over!';
+        choicesEl.innerHTML = '';
+        const endTime = Date.now();
+        const elapsedSeconds = Math.floor((endTime - startTime) / 1000);
+
+        let stars = '⭐';
+        if (elapsedSeconds < 20) {
+          stars = '⭐️⭐️⭐️';
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 }
+          });
+        }
+        else if (elapsedSeconds < 40) stars = '⭐️⭐️';
+
+        progressEl.innerHTML = `<div class='text-4xl font-bold text-green-600 mt-4'>Final Score: ${score}/10</div><div class='text-lg mt-2'>You completed 10 questions in ${elapsedSeconds} seconds!</div><div class='text-3xl mt-2'>${stars}</div>`;
+        playAgainBtn.classList.remove('hidden');
+        return;
+      }
+
+      const a = selectedNumbers[Math.floor(Math.random() * selectedNumbers.length)];
+      const b = Math.floor(Math.random() * 9) + 1;
+      correctAnswer = a * b;
+      questionEl.textContent = `${a} x ${b}`;
+      progressEl.textContent = `Progress: ${count} / 10`;
+
+      // Generate 4 wrong answers and 1 correct
+      const answers = new Set([correctAnswer]);
+      while (answers.size < 4) {
+        answers.add(Math.floor(Math.random() * 81) + 1);
+      }
+
+      const shuffled = Array.from(answers).sort(() => Math.random() - 0.5);
+
+      choicesEl.innerHTML = '';
+      shuffled.forEach(ans => {
+        const btn = document.createElement('button');
+        btn.textContent = ans;
+        btn.className = 'bg-white border border-gray-400 px-4 py-2 rounded hover:bg-gray-200';
+        btn.onclick = () => {
+          if (ans === correctAnswer) {
+            nextQuestion();
+          } else {
+            score--;
+            feedbackEl.textContent = "Oops, that's not correct";
+          }
+        };
+        choicesEl.appendChild(btn);
+      });
+    }
+  </script>
+</body>
+</html>
